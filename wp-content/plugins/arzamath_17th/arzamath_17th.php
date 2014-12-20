@@ -86,3 +86,57 @@ if(class_exists('WP_Plugin_Template'))
     $wp_plugin_template = new WP_Plugin_Template();
 
 }
+
+add_action( 'admin_footer', 'wp_action_javascript' );
+
+function wp_action_javascript() {
+
+    ?>
+
+    <script type="text/javascript">
+
+        jQuery (function buttonClicked ($) {
+
+            $(" #button ").click( function () {
+                $a = $( " #meta-text " ).val();
+                $b = $( " #meta-multi-select " ).val();
+                $c = $( " #meta-add-img " ).val();
+                $d = <?php the_ID(); ?>;
+
+                var data = {
+                    'action' : 'my_action',
+                    'text'   : $a,
+                    'select' : $b,
+                    'file'   : $c,
+                    'post'   : $d
+                };
+
+                $.post( ajaxurl, data, function ( response ) {
+                    alert( response );
+                });
+
+            });
+
+        });
+
+    </script>
+
+<?php
+}
+
+add_action( 'wp_ajax_my_action', 'wp_action_callback');
+
+function wp_action_callback()
+{
+    global $homework_db;
+
+    $post_id = $_POST['post'];
+
+    update_post_meta($post_id, 'meta-text', $_POST['text']);
+    update_post_meta($post_id, 'meta-multi-select', $_POST['select']);
+    update_post_meta($post_id, 'meta-add-img', $_POST['file']);
+
+    echo(' Congratulation your results saved :)');
+
+    die();
+};
